@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7fb">
+  <meta name="description" content="Планер домашних заданий для учебной группы — месячный календарь, четыре недели, дедлайны, файлы и комментарии.">
+  <title>по плану — домашние задания группы</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-symbol" aria-hidden="true">✳</span><span>по плану<span class="brand-dot">.</span></span></div>
+      <div class="group-badge"><span class="online-dot"></span><span id="groupTitle">Планер нашей группы</span></div>
+      <div class="nav-caption">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav class="nav-list" aria-label="Разделы">
+        <button class="nav-item active" data-nav="calendar"><span class="nav-icon">▦</span><span>Календарь</span></button>
+        <button class="nav-item" data-nav="tasks"><span class="nav-icon">☷</span><span>Все задания</span><span class="nav-counter" id="navTaskCount">0</span></button>
+        <button class="nav-item" data-nav="subjects"><span class="nav-icon">◈</span><span>Предметы</span></button>
+      </nav>
+      <div class="sidebar-separator"></div>
+      <div class="sidebar-section-head"><span>МОИ ПРЕДМЕТЫ</span><button id="clearFilter" title="Показать все предметы" class="link-icon">↺</button></div>
+      <div class="subject-list" id="subjectSidebar"></div>
+      <div class="sidebar-bottom">
+        <div class="progress-card">
+          <div class="progress-top"><span class="progress-icon">✦</span><span>МОЙ ПРОГРЕСС</span></div>
+          <div class="progress-value" id="progressLabel">0 из 0 готово</div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-note">Отмечай выполненные задания — отметки видны только тебе.</div>
+        </div>
+        <div class="sidebar-footer" id="modeNotice">Все домашки в одном месте ✨</div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-breadcrumb">УЧЁБА <span>/</span> <strong id="crumb">КАЛЕНДАРЬ</strong></div>
+        <div class="topbar-actions">
+          <span id="todaySmall" class="today-small"></span>
+          <button class="btn btn-text" id="adminBtn">Войти как староста</button>
+          <button class="btn btn-primary" id="newTaskBtn" hidden><span class="btn-plus">+</span> Добавить ДЗ</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-heading"><div><div class="eyebrow">ТВОЁ УЧЕБНОЕ ПРОСТРАНСТВО <span>✴</span></div><h1 id="pageTitle">Домашка под контролем<span class="accent-dot">.</span></h1><p id="pageSubtitle">Задания, дедлайны и материалы — ничего не потеряется.</p></div><div class="heading-sparkle" aria-hidden="true">✳</div></div>
+        <div class="stats-row" id="statsRow">
+          <div class="stat-card"><span class="stat-icon lavender">▤</span><span class="stat-name">Всего заданий</span><strong id="statAll">0</strong></div>
+          <div class="stat-card"><span class="stat-icon peach">◷</span><span class="stat-name">На этой неделе</span><strong id="statWeek">0</strong></div>
+          <div class="stat-card"><span class="stat-icon mint">◉</span><span class="stat-name">Ближайший дедлайн</span><strong class="stat-date" id="statNext">—</strong></div>
+          <div class="stat-card"><span class="stat-icon blue">✓</span><span class="stat-name">Мною выполнено</span><strong id="statDone">0</strong></div>
+        </div>
+
+        <div class="content-layout" id="contentLayout">
+          <section class="main-panel" aria-label="Содержимое планера">
+            <div id="calendarScreen">
+              <div class="section-head"><div><h2>Календарь дедлайнов <span class="little-star">✦</span></h2><p>Нажми на день, чтобы посмотреть домашку</p></div><div class="segment" role="group" aria-label="Вид календаря"><button id="monthTab" class="segment-btn selected">Месяц</button><button id="weeksTab" class="segment-btn">4 недели</button></div></div>
+              <div class="calendar-card">
+                <div class="cal-controls"><div class="cal-period" id="calPeriod"></div><div class="cal-nav"><button id="prevPeriod" title="Назад" aria-label="Предыдущий период">‹</button><button class="today-btn" id="todayBtn">Сегодня</button><button id="nextPeriod" title="Вперёд" aria-label="Следующий период">›</button></div></div>
+                <div class="weekday-header"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+              </div>
+              <div class="under-calendar"><span><i class="legend-marker" style="background:#8d79d9"></i>Дедлайн</span><span><i class="legend-ring"></i>Сегодня</span><span><i class="legend-check">✓</i>Выполнено</span></div>
+            </div>
+            <div id="tasksScreen" hidden>
+              <div class="section-head"><div><h2>Все домашние задания <span class="little-star">✦</span></h2><p>Фильтруй по предмету и отмечай выполненное</p></div></div>
+              <div class="filters"><label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="Поиск по заданиям..." aria-label="Поиск"></label><select id="subjectFilter" aria-label="Фильтр по предмету"></select><select id="statusFilter" aria-label="Статус"><option value="all">Все статусы</option><option value="todo">Не выполнено</option><option value="done">Выполнено</option></select></div>
+              <div id="taskList" class="all-task-list"></div>
+            </div>
+            <div id="subjectsScreen" hidden>
+              <div class="section-head"><div><h2>Наши предметы <span class="little-star">✦</span></h2><p>Все дисциплины и их ближайшие задания</p></div></div>
+              <div id="subjectCards" class="subject-cards"></div>
+            </div>
+          </section>
+          <aside class="right-panel" id="rightPanel">
+            <div class="right-top-label">В ФОКУСЕ <span>✳</span></div>
+            <div class="selected-day-head"><div class="big-date" id="selectedDateNum">17</div><div class="selected-date-name"><strong id="selectedDayName">Суббота</strong><span id="selectedMonthName">октября 2026</span></div></div>
+            <div class="selected-date-caption"><h3>На этот день</h3><span id="dayTaskCount" class="small-count">0</span></div>
+            <div id="selectedTasks" class="selected-tasks"></div>
+            <div class="upcoming-head"><h3>Скоро сдавать</h3><span>↗</span></div>
+            <div id="upcomingTasks" class="upcoming-list"></div>
+            <div class="aside-tip"><span>✦</span><p>Совет: открывай задания, чтобы увидеть требования, ссылки и файлы от старосты.</p></div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="modalRoot" class="modal-root" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <template id="emptyIcon"><span class="empty-illustration">✳</span></template>
+</body>
+</html>
